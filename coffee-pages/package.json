@@ -1,0 +1,13 @@
+{
+  "name": "@coffee/pages",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --port 8500",
+    "start": "wrangler dev --port 8500"
+  },
+  "devDependencies": {
+    "wrangler": "^4.156.0"
+  }
+}

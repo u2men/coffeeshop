@@ -1,0 +1,13 @@
+{
+  "name": "@coffee/worker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --port 8501",
+    "start": "wrangler dev --port 8501"
+  },
+  "devDependencies": {
+    "wrangler": "^4.156.0"
+  }
+}

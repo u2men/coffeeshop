@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#ffffff">
+	<title>Coffee Menu</title>
+	<style>
+		* {
+			box-sizing: border-box
+		}
+
+		body {
+			margin: 0;
+			background: #f3f1ef;
+			color: #151515;
+			font-family: Arial, Helvetica, sans-serif
+		}
+
+		button,
+		input {
+			font: inherit
+		}
+
+		button {
+			cursor: pointer
+		}
+
+		.app {
+			max-width: 480px;
+			min-height: 100dvh;
+			margin: auto;
+			background: #fff;
+			box-shadow: 0 0 35px #3520130c;
+			position: relative;
+			padding-bottom: 76px
+		}
+
+		.hero {
+			height: clamp(200px, 51vw, 260px);
+			background: #51301f url('https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=1000&q=85') center 53%/cover
+		}
+
+		.content {
+			padding: 26px 22px 12px
+		}
+
+		h1 {
+			font-size: 28px;
+			letter-spacing: -1px;
+			margin: 0 0 22px
+		}
+
+		.search {
+			height: 48px;
+			width: min(100%, 270px);
+			border: 1px solid #e8e4e1;
+			border-radius: 30px;
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 0 16px;
+			color: #777
+		}
+
+		.search svg {
+			width: 18px;
+			height: 18px;
+			flex: none
+		}
+
+		.search input {
+			border: 0;
+			outline: 0;
+			width: 100%;
+			font-size: 13px;
+			background: transparent
+		}
+
+		.filters {
+			display: flex;
+			gap: 7px;
+			overflow: auto;
+			margin: 18px 0 14px;
+			scrollbar-width: none
+		}
+
+		.filters::-webkit-scrollbar {
+			display: none
+		}
+
+		.filter {
+			border: 0;
+			border-radius: 30px;
+			background: #f5f4f3;
+			color: #6d6a68;
+			padding: 11px 13px;
+			font-size: 11px;
+			white-space: nowrap
+		}
+
+		.filter.active {
+			background: #171717;
+			color: white
+		}
+
+		.menu-item {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+			padding: 12px 0;
+			border-bottom: 1px solid #eeeae7
+		}
+
+		.menu-item img {
+			width: 78px;
+			height: 78px;
+			object-fit: cover;
+			border-radius: 9px;
+			background: #e8ded6
+		}
+
+		.details {
+			min-width: 0;
+			flex: 1
+		}
+
+		.details h2 {
+			font-size: 15px;
+			margin: 0 0 8px;
+			letter-spacing: -.2px
+		}
+
+		.price {
+			font-size: 13px;
+			margin: 0 0 7px
+		}
+
+		.description {
+			font-size: 10px;
+			line-height: 1.4;
+			color: #77716d;
+			margin: 0
+		}
+
+		.add {
+			width: 40px;
+			height: 40px;
+			flex: none;
+			border: 0;
+			border-radius: 50%;
+			background: #824015;
+			color: white;
+			font-size: 24px;
+			font-weight: 300;
+			line-height: 1
+		}
+
+		.add:active {
+			transform: scale(.94)
+		}
+
+		.empty {
+			font-size: 14px;
+			color: #777;
+			padding: 30px 0
+		}
+
+		.nav {
+			position: fixed;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: min(100%, 480px);
+			height: 76px;
+			background: #fff;
+			border-top: 1px solid #e8e4e1;
+			display: flex;
+			justify-content: space-around;
+			align-items: center;
+			padding-bottom: env(safe-area-inset-bottom)
+		}
+
+		.nav button {
+			border: 0;
+			background: none;
+			color: #777;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 5px;
+			font-size: 10px;
+			min-width: 55px
+		}
+
+		.nav button.active {
+			color: #171717;
+			font-weight: 700
+		}
+
+		.nav svg {
+			width: 22px;
+			height: 22px;
+			stroke: currentColor;
+			fill: none;
+			stroke-width: 1.4;
+			stroke-linecap: round;
+			stroke-linejoin: round
+		}
+
+		.count {
+			position: absolute;
+			top: 8px;
+			margin-left: 20px;
+			background: #824015;
+			color: #fff;
+			border-radius: 20px;
+			min-width: 16px;
+			height: 16px;
+			line-height: 16px;
+			font-size: 9px
+		}
+
+		.count:empty {
+			display: none
+		}
+
+		@media(max-width:360px) {
+			.content {
+				padding: 22px 18px
+			}
+
+			.menu-item img {
+				width: 70px;
+				height: 70px
+			}
+
+			.details h2 {
+				font-size: 14px
+			}
+
+			.description {
+				font-size: 9px
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<coffee-menu></coffee-menu>
+	<script>
+		const API_BASE_URL = 'http://localhost:8501/api';
+		class CoffeeMenu extends HTMLElement {
+			connectedCallback() {
+				this.items = [];
+				this.category = 'All coffees'; this.count = 0;
+				this.innerHTML = `<main class="app"><div class="hero" role="img" aria-label="A freshly made cup of latte"></div><section class="content"><h1>Menu</h1><label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><input type="search" placeholder="Find your coffee..." aria-label="Find your coffee"></label><div class="filters" aria-label="Coffee categories"></div><div class="items" aria-live="polite"></div></section><nav class="nav" aria-label="Main navigation"><button type="button" data-nav="Home"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10h-6v-6H9v6H3z"/></svg>Home</button><button type="button" class="active" data-nav="Menu" aria-current="page"><svg viewBox="0 0 24 24"><path d="M5 8h13v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM18 10h1a2 2 0 0 1 0 4h-1M9 3v2m5-2v2M4 21h15"/></svg>Menu</button><button type="button" data-nav="Orders"><span class="count"></span><svg viewBox="0 0 24 24"><path d="M5 7h14l1 14H4L5 7zM9 8V5a3 3 0 0 1 6 0v3"/></svg>Orders</button><button type="button" data-nav="Profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg>Profile</button></nav></main>`;
+				this.querySelector('input').addEventListener('input', () => this.renderItems());
+				this.renderFilters(); this.renderItems();
+			}
+			set coffees(value) {
+				this.items = value;
+				this.renderItems();
+			}
+			renderFilters() {
+				const filters = this.querySelector('.filters'); filters.innerHTML = '';
+				['All coffees', 'Hot coffee', 'Iced coffee', 'Non-coffee'].forEach(category => {
+					const button = document.createElement('button'); button.type = 'button'; button.className = 'filter' + (this.category === category ? ' active' : ''); button.textContent = category; button.setAttribute('aria-pressed', this.category === category);
+					button.addEventListener('click', () => { this.category = category; this.renderFilters(); this.renderItems(); }); filters.append(button);
+				});
+			}
+			renderItems() {
+				const query = this.querySelector('input').value.trim().toLowerCase();
+				const items = this.items.filter(item => (this.category === 'All coffees' || item.category === this.category) && (item.name + ' ' + item.description).toLowerCase().includes(query));
+				const list = this.querySelector('.items'); list.innerHTML = '';
+				if (!items.length) { list.innerHTML = '<p class="empty">No drinks found. Try another search.</p>'; return; }
+				items.forEach(item => {
+					const row = document.createElement('article'); row.className = 'menu-item';
+					row.innerHTML = `<img src="${item.image}" alt="" loading="lazy"><div class="details"><h2>${item.name}</h2><p class="price">${item.price}</p><p class="description">${item.description}</p></div><button class="add" type="button" aria-label="Add ${item.name} to order">+</button>`;
+					row.querySelector('.add').addEventListener('click', () => { this.count++; this.querySelector('.count').textContent = this.count; }); list.append(row);
+				});
+			}
+		}
+		customElements.define('coffee-menu', CoffeeMenu);
+		fetch(`${API_BASE_URL}/coffees`)
+				.then(response => response.json())
+				.then(data => {
+					document.querySelector('coffee-menu').coffees = data;
+				});
+	</script>
+</body>
+
+</html>

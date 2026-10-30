@@ -1,0 +1,22 @@
+{
+  "name": "coffeeshop",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:pages": "npm run dev --workspace @coffee/pages",
+    "dev:worker": "npm run dev --workspace @coffee/worker"
+  },
+  "workspaces": [
+    "coffee-pages",
+    "coffee-worker"
+  ],
+  "dependencies": {
+    "create-cloudflare": "^2.74.5",
+    "hono": "^4.13.14"
+  }
+}
